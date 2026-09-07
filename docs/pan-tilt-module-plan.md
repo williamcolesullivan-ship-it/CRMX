@@ -34,20 +34,28 @@ close to the pivot point in normal use — gravity torque is modest even at the
 1.43 kg worst case. This is a light-duty gimbal, not a heavy touring fixture;
 size motors accordingly (see §3.2).
 
-## 3. Remaining open questions
+## 3. Spec decisions
 
-These still need answers before locking the design, though they're smaller
-in scope now that the payload is known:
-
-- Required pan range (continuous 360° vs. limited sweep) and tilt range —
-  driven by how the panel will be used to redirect a beam.
-- Required speed/accuracy (slow smooth sweeps vs. fast "hit-a-mark" moves).
-- Environment: studio-only, or does it need to survive being knocked around
-  a set/location (drop/vibration), or outdoors (IP rating, temp range)?
-- Target unit cost and expected production quantity (one-off vs. small
-  batch changes part choices below).
-- Whether genuine CRMX certification/branding is a hard requirement, or a
-  generic 2.4 GHz wireless-DMX link (no licensing) is acceptable.
+- **Speed:** slow, deliberate moves — not a fast "hit-a-mark" fixture. Target
+  ~3–10 seconds for a full-range move; the DMX speed channel scales within
+  that band rather than allowing snap moves.
+- **Range (proposed, pending confirmation):**
+  - Pan: ~180–270°. Enough to reposition the reflected beam across a room
+    without needing continuous 360° rotation, which would require a slip
+    ring this design doesn't otherwise need.
+  - Tilt: ~90–120°. Reflection angle changes at 2× the mirror's mechanical
+    tilt, so this range covers everything from a steep bounce to a
+    near-grazing angle.
+  - These are a starting point sized to the use case, not a hard
+    requirement — revisit once you've mocked up a few real bounce angles.
+- **Environment:** indoors only, both studio and on-location. No IP rating
+  needed, but the enclosure should tolerate being handled, packed, and moved
+  between sets — not a fragile lab prototype.
+- **Quantity:** fewer than 5 units. This is a small hand-built run, not a
+  product line — it changes sourcing and process (§4.1, §5) away from
+  anything that assumes tooling or OEM minimums.
+- **CRMX: required, non-negotiable.** See §4.1 for how this pairs with the
+  Blackout app specifically.
 
 ## 4. System architecture
 
@@ -60,14 +68,32 @@ Console (DMX) --wireless--> CRMX RX module --wired DMX--> Controller PCB
 Housing: female 5/8" baby pin on each end, mirror gimbal/cradle in the middle
 ```
 
-### 4.1 Wireless link
-- Use a certified OEM CRMX RX module (e.g. LumenRadio Nova/SuperNova RXi
-  family) rather than reimplementing the CRMX RF protocol. It outputs
-  standard DMX512, which is the only interface the rest of the design needs
-  to know about. This is the legally supportable path to real CRMX
-  interoperability.
-- Fallback if certification isn't required: a generic W-DMX/2.4 GHz wireless
-  DMX transceiver module — cheaper, no licensing, not literally "CRMX."
+### 4.1 Wireless link — CRMX, and how it pairs with Blackout
+
+CRMX is required, so this section is now load-bearing, not a fallback
+discussion.
+
+**The Blackout app itself does not speak CRMX.** Blackout (iPad) outputs
+Art-Net/sACN over WiFi/Ethernet. To get CRMX out of that chain you need a
+CRMX transmitter/gateway node sitting between the iPad and the fixtures —
+e.g. LumenRadio Stardust/Aurora, Exalux Connect One/Connect+, Ratpac AKS+
+(all take WiFi Art-Net/sACN in, output CRMX), or a wired USB-C option like
+FTSLED Cerise/Cinelex Skycast if you'd rather run a cable to the iPad. That
+TX node is **not part of this module** — it's simply the CRMX transmitter
+our modules pair with, exactly as they would with any other CRMX fixture.
+If you don't already own one, it's a prerequisite purchase for this whole
+system to function, independent of anything built here.
+
+**RX side, sized for <5 units:** don't go through LumenRadio's OEM/CRMXchip
+channel — that's built for manufacturers embedding the chip at volume and
+requires a partner relationship with LumenRadio, a poor fit for a small
+hand-built run. Instead, buy standalone retail CRMX receiver units (e.g. the
+LumenRadio CRMX Slim RX RDM class of product) — each one is a small
+certified CRMX receiver that outputs plain DMX512 over XLR/terminal block.
+Mount one per module and wire its DMX output straight into the controller
+board's DMX input. This is fully certified, requires no OEM relationship,
+and pairs with any certified CRMX transmitter — including whichever one you
+pair with Blackout.
 
 ### 4.2 Controller
 - MCU (e.g. STM32F0/G0) reading DMX512 via an isolated RS-485 transceiver
@@ -89,18 +115,19 @@ Housing: female 5/8" baby pin on each end, mirror gimbal/cradle in the middle
   not necessarily left-right — check the datasheet drawing before finalizing
   motor torque).
 
-### 4.3 DMX personality (draft — finalize once ranges are known)
-| Ch | Function      |
-|----|---------------|
-| 1  | Pan (coarse)  |
-| 2  | Pan (fine)    |
-| 3  | Tilt (coarse) |
-| 4  | Tilt (fine)   |
-| 5  | Pan/tilt speed|
-| 6  | Control/macro (home, reset, fine/coarse mode) |
+### 4.3 DMX personality (draft)
+| Ch | Function      | Notes |
+|----|---------------|-------|
+| 1  | Pan (coarse)  | Maps to ~180–270° mechanical range |
+| 2  | Pan (fine)    | |
+| 3  | Tilt (coarse) | Maps to ~90–120° mechanical range |
+| 4  | Tilt (fine)   | |
+| 5  | Pan/tilt speed| Scales within the ~3–10s full-range move target — no snap-move mode |
+| 6  | Control/macro (home, reset, fine/coarse mode) | |
 
-Publish this as a standard fixture profile (GDTF/.xml or vendor-specific
-format) once locked, so it can be imported into consoles.
+Build this as a custom fixture profile in Blackout's Fixture Creation Wizard
+once the channel map and ranges are final, so it shows up alongside your
+other patched fixtures.
 
 ### 4.4 Mechanical
 - One female 5/8" socket accepts the panel's own Godox WMS rail-mount stud
@@ -127,32 +154,40 @@ format) once locked, so it can be imported into consoles.
 
 ## 5. Development phases
 
-1. **Spec lock** — answer the remaining open questions in §3.
-2. **Electrical design** — schematic (KiCad): MCU, DMX/RDM interface, CRMX
-   RX module integration, motor drivers, encoders, power supply.
+Scoped for a <5-unit hand-built run: 3D-printed mechanical parts (no
+tooling/injection molding needed), small-run PCBs (e.g. JLCPCB/OSH Park),
+hand assembly. No FCC/CE self-certification needed since these aren't being
+sold — the standalone CRMX RX units are already certified, which covers the
+only RF component in the design.
+
+1. **Spec lock** — confirm the pan/tilt ranges in §3 once mocked up.
+2. **Electrical design** — schematic (KiCad): MCU, DMX input from the
+   standalone CRMX RX unit's DMX-out, motor drivers, encoders, power supply.
 3. **Mechanical design** — CAD (Fusion 360/SolidWorks): gimbal, motor
    mounts, baby-pin receptacle bosses, cable routing, weight/balance
-   analysis for the mirror payload.
+   analysis across the full LiteFlow size range.
 4. **Firmware** — DMX512 receive (+ RDM optional), motion control, homing,
-   soft limits, acceleration profiles.
-5. **Prototype build** — dev-board electronics + 3D-printed mechanical
-   prototype; validate motion range, DMX responsiveness, wireless range and
-   reliability.
-6. **Iterate** — refine motor/gear selection from measured mirror inertia;
-   refine enclosure for cable strain relief and the rigging safety point.
-7. **Testing** — DMX conformance, 2.4 GHz coexistence (interference from
-   Wi-Fi/other wireless DMX gear), thermal, vibration/drop (if touring),
-   rigging load test.
-8. **Documentation** — DMX chart/fixture profile, wiring diagrams, user
-   manual.
-9. **Compliance (if going beyond a one-off)** — FCC/CE for the wireless
-   module (usually pre-certified if bought as an OEM module), UL/ETL for
-   the electrical assembly if sold commercially.
+   soft limits, slow acceleration profiles per §3.
+5. **Prototype build** — one unit first: dev-board electronics + 3D-printed
+   mechanical prototype; validate motion range, DMX responsiveness, and CRMX
+   link reliability through your actual Blackout → TX node → RX chain.
+6. **Iterate** — refine motor/gear selection from measured behavior; refine
+   enclosure for cable strain relief and the rigging safety point.
+7. **Testing** — DMX conformance, CRMX range/reliability test in the actual
+   studio and location environments you'll use it in, rigging load test.
+8. **Build remaining units** — replicate once the first prototype is
+   validated.
+9. **Documentation** — DMX chart, Blackout fixture profile, wiring diagrams.
 
 ## 6. Key risks
 
+- **You need a CRMX TX node before any of this works.** Blackout only
+  outputs WiFi Art-Net/sACN — confirm you have (or budget for) a CRMX
+  transmitter/gateway (Stardust, Aurora, Exalux Connect, etc.) before
+  building the RX side. See §4.1.
 - CRMX licensing/certification — see §4.1; don't attempt to reverse-engineer
-  the RF protocol.
+  the RF protocol; use certified standalone RX units instead of the OEM
+  chip channel given the small quantity.
 - Verify the rail-mount location on the actual panel (not just the 5/8" stud
   spec) before finalizing motor torque — an off-center rail would raise the
   worst-case moment above the light-duty estimate in §4.2.
@@ -169,3 +204,8 @@ format) once locked, so it can be imported into consoles.
 - [Godox Rail Mount Stud (WMS) for KNOWLED LiteFlow — B&H](https://www.bhphotovideo.com/c/product/1797737-REG/godox_wms_rail_mount_stud_for.html)
 - [What are the Godox LiteFlow Cine Light Reflector Panels? — Essential Photo](https://www.essentialphoto.co.uk/blogs/news/what-is-the-godox-liteflow-cine-light-reflector-panel-series)
 - [Godox KNOWLED LiteFlow Kits now available — Newsshooter](https://www.newsshooter.com/2024/01/19/godox-knowled-liteflow-kits-now-available/)
+- [The Ultimate Guide to Controlling Aputure, ARRI, and Nanlux Lights via CRMX | RTctrl + Blackout App](https://rtctrl.com/solutions/crmx-guide/)
+- [Blackout Lighting Console — App Store](https://apps.apple.com/us/app/blackout-lighting-console/id1414562959)
+- [Hardware Setup — Blackout User Manual](https://docs.blackout-app.com/manual/introduction/hardware-setup)
+- [CRMX OEM Modules | Wireless DMX for Manufacturers — LumenRadio](https://lumenradio.com/wireless-dmx/crmx-oem-modules/)
+- [CRMX Slim RX RDM — LumenRadio](https://lumenradio.com/products/crmx-slim-rx-rdm/)
