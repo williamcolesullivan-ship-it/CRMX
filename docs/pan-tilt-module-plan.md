@@ -152,8 +152,13 @@ unit — accepted here in exchange for the smallest possible footprint.
 - Two motor axes (pan, tilt): NEMA 11 or NEMA 14 stepper motors — the 1.43 kg
   worst-case payload with a roughly centered mount point is light duty, so
   NEMA 17 isn't needed and would just add bulk/weight the module doesn't
-  need. Drive with quiet step/dir drivers (e.g. TMC2209) through a small
-  belt or spur-gear reduction.
+  need.
+- **Both motors are direct-drive, co-located in the one housing (see 4.4
+  rev B)** — no belt or remote transmission. The original plan called for a
+  belt or spur-gear run from a housing-mounted motor out to a remote tilt
+  pivot; moving the housing to sit directly behind the mirror instead means
+  the tilt motor can couple straight to the tilt joint, and the belt/gear
+  line item in the BOM goes away.
 - Optional absolute magnetic encoders (e.g. AS5600) per axis for homing and
   closed-loop accuracy — recommended if the panel needs to return to a
   known position after power cycling.
@@ -179,14 +184,45 @@ Build this as a custom fixture profile in Blackout's Fixture Creation Wizard
 once the channel map and ranges are final, so it shows up alongside your
 other patched fixtures.
 
-### 4.4 Mechanical
-- One female 5/8" socket accepts the panel's own Godox WMS rail-mount stud
-  directly (no custom bracket for the panel side); the other female 5/8"
-  socket accepts a male stud from whatever the module is rigged to
-  (C-stand, boom arm, grip head).
-- Gimbal sized around the full LiteFlow size range (3" up to 20"); the pivot
-  point should land at the panel's rail location so the CG stays close to
-  the axes across sizes.
+### 4.4 Mechanical — rev B: single housing behind the mirror
+
+Superseded design: the first pass borrowed a two-arm yoke from stage
+moving-head fixtures, reaching down from a housing near the stand mount to
+grab the mirror at a remote pivot. That template fits fixtures with a heavy,
+centered lamp engine needing two-sided support — it doesn't fit this
+hardware, which is thin, light, and already has a single center-back mount
+point (the WMS rail stud). Forcing a yoke onto a single-point mount also
+meant the tilt motor had to live ~10+ inches from the pan motor, needing a
+belt drive or a second motor cantilevered out on a strut — worse for a
+"slow, smooth, no wobble" fixture than the yoke arms were solving for.
+
+**Current design:** one compact housing sandwiches directly between the two
+baby pin sockets — no arms, no belt.
+
+- Stand-side female 5/8" socket on the housing's back face, mating to a
+  male stud from whatever the module is rigged to (C-stand, boom arm, grip
+  head) — unchanged from rev A.
+- Inside the housing: a pan bearing/motor between the fixed stand-facing
+  face and the rotating body, and a tilt bearing/motor between the housing
+  and the mirror mount — both motors co-located, both direct-drive.
+- A short standoff stud (not a long arm) connects the housing's front face
+  to the mirror's own WMS stud, which plugs into the mirror-side female
+  socket at the standoff's end.
+- **The real trade-off, sized explicitly rather than hidden:** the standoff
+  has to be long enough that the panel's edge clears the housing through its
+  tilt swing. Swing distance at the edge is `half-panel-size × sin(tilt
+  angle)` — trivial for the 3" panel, real for the 20" one. At a 5" standoff,
+  the 20" panel starts crowding the housing past roughly ±24° of tilt; the
+  3" and 10" panels clear the full range with room to spare. Options if the
+  full tilt range is needed at 20": lengthen the standoff (partially
+  reintroducing what the arms were doing, just on a single fixed axis
+  instead of two splayed ones), or notch the housing on the side the panel
+  swings toward. See the [3D model](https://claude.ai/code/artifact/e48f5b2e-a5e3-4563-9f12-0844e0b88291)
+  for a live version of this constraint — it flags the exact angle where
+  clearance runs out for whichever panel size is selected.
+- Gimbal/housing sized around the full LiteFlow range (3" up to 20"); since
+  the mount point is the panel's own rail (roughly centered), the CG stays
+  close to both axes regardless of size — unchanged from rev A.
 - **Safety**: even at this light payload, anything positioned over a set or
   overhead needs a secondary safety attachment (safety cable/wire) rated for
   the full assembly weight plus margin — standard grip/rigging practice,
