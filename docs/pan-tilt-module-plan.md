@@ -99,9 +99,6 @@ pricing rather than lighting-industry pricing:
   interoperability as any other CRMX product.
 - 5V/90mA via USB-C — trivial to power.
 - 110×53×26mm, 80g — small enough to mount alongside the gimbal.
-- Output: 5-pin female XLR (standard DMX cable) — wire it in via a short
-  DMX jumper into an XLR jack on the controller enclosure, rather than
-  cutting the connector off, so the unit stays usable standalone.
 - Confirmed working with Blackout in the field by outside users.
 - Bonus: same brand as the LiteFlow mirrors, so the system stays
   single-vendor.
@@ -110,6 +107,43 @@ Alternative: the LumenRadio CRMX Slim RX RDM is IP65-rated with a terminal
 block, but at ~$400–600/unit it's 2–3x the cost for ruggedization this
 indoor-only build doesn't need. Use it only if a future revision needs
 that rating.
+
+**Chosen integration: strip the TimoLink RX down to bare PCB.** Given the
+priority on physical size, don't keep the unit in its own enclosure with a
+cable running to the controller — desolder its connectors and wire directly
+into the controller board. This is undocumented territory (no public
+teardown exists, and Godox's manual says not to disassemble it — repairs go
+through them, so this trades that support path away, which is an accepted
+cost here, not a blocker) — plan the procedure as: verify with a stock unit
+first, then modify.
+
+1. **Validate before cutting.** Buy one, confirm it pairs with your existing
+   CRMX transmitter and Blackout as a stock unit. This isolates "does CRMX
+   work in this setup" from "did the mod work" as separate debugging steps.
+2. **Open the case** and locate the PCB.
+3. **DMX tap:** probe the XLR footprint with a multimeter against the
+   standard DMX512 pinout (pin 1 = ground/shield, pin 2 = Data−, pin 3 =
+   Data+). Desolder the physical XLR jack, solder three wires to the
+   exposed pads, and feed them into the controller's own MAX485 RS-485
+   receiver — this tap point is past the chip's internal RS-485 driver, so
+   the external MAX485 stage is still needed.
+4. **Power tap:** locate VBUS/GND at the USB-C footprint, desolder the
+   jack, and feed 5V/GND directly from the controller's own rail. At only
+   90mA with no PD negotiation implied by the spec, the CC pull-down
+   resistors needed for default-5V sink behavior are almost certainly
+   already on the board and unaffected by removing the physical connector.
+5. **Worth checking while open:** LumenRadio's CRMXchip documentation
+   describes a TTL-level DMX interface (≤3.3V) in addition to the RS-485
+   output, meant for direct UART connection to a host MCU. If that's
+   broken out to accessible test points on this board, the external
+   MAX485 chip in step 3 can be skipped entirely — not guaranteed without
+   opening one, but worth probing for.
+6. Confirm antenna type (PCB trace/chip antenna is likely given the
+   product's compact form factor) before finalizing enclosure layout, so
+   metal or ground-plane placement in the housing doesn't degrade range.
+
+This is a one-way modification — no warranty, no reuse as a standalone
+unit — accepted here in exchange for the smallest possible footprint.
 
 ### 4.2 Controller
 - MCU (e.g. STM32F0/G0) reading DMX512 via an isolated RS-485 transceiver
