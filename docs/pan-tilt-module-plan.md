@@ -85,15 +85,31 @@ You've confirmed you already have a CRMX transmitter, so this is resolved —
 nothing further to build or buy on the TX side.
 
 **RX side, sized for <5 units:** don't go through LumenRadio's OEM/CRMXchip
-channel — that's built for manufacturers embedding the chip at volume and
-requires a partner relationship with LumenRadio, a poor fit for a small
-hand-built run. Instead, buy standalone retail CRMX receiver units (e.g. the
-LumenRadio CRMX Slim RX RDM class of product) — each one is a small
-certified CRMX receiver that outputs plain DMX512 over XLR/terminal block.
-Mount one per module and wire its DMX output straight into the controller
-board's DMX input. This is fully certified, requires no OEM relationship,
-and pairs with any certified CRMX transmitter — including whichever one you
-pair with Blackout.
+channel — that's exactly how Godox and Aputure do it internally (Aputure's
+own docs confirm every fixture ships with an embedded LumenRadio CRMX
+module), but it means a board-level chip design-in with an NDA and volume
+commitment to LumenRadio. Right approach for a manufacturer, wrong one for
+five hand-built units.
+
+**Recommended: Godox TimoLink RX ($189, B&H).** This is the accessible
+version of the same thing — Godox took the identical LumenRadio CRMX
+receiver and put it in a small standalone retail box, at Godox consumer
+pricing rather than lighting-industry pricing:
+- Built around a genuine LumenRadio CRMX receiver — fully certified, same
+  interoperability as any other CRMX product.
+- 5V/90mA via USB-C — trivial to power.
+- 110×53×26mm, 80g — small enough to mount alongside the gimbal.
+- Output: 5-pin female XLR (standard DMX cable) — wire it in via a short
+  DMX jumper into an XLR jack on the controller enclosure, rather than
+  cutting the connector off, so the unit stays usable standalone.
+- Confirmed working with Blackout in the field by outside users.
+- Bonus: same brand as the LiteFlow mirrors, so the system stays
+  single-vendor.
+
+Alternative: the LumenRadio CRMX Slim RX RDM is IP65-rated with a terminal
+block, but at ~$400–600/unit it's 2–3x the cost for ruggedization this
+indoor-only build doesn't need. Use it only if a future revision needs
+that rating.
 
 ### 4.2 Controller
 - MCU (e.g. STM32F0/G0) reading DMX512 via an isolated RS-485 transceiver

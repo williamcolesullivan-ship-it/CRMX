@@ -26,9 +26,9 @@ the form factor or finish demands it.
 
 | Item | Example part | Qty/unit | Notes |
 |---|---|---|---|
-| CRMX receiver | LumenRadio CRMX Slim RX RDM | 1 | IP65, terminal-block DMX/RDM out — wire straight to the control board's DMX input. Certified, no OEM relationship needed. **~$400–600/unit** — see pricing note below. |
+| CRMX receiver | Godox TimoLink RX | 1 | **$189 (B&H)**. Built around a genuine LumenRadio CRMX receiver, same as Godox/Aputure use internally, just packaged as a retail unit instead of a board-level OEM chip. USB-C powered, 5-pin XLR DMX out. See pricing note below for the (costlier) alternative. |
 | Control board | BTT SKR Mini E3 V3 (or similar STM32-based 3D-printer board) | 1 | ~$25–30. Integrates MCU + 2 TMC2209 driver sockets. |
-| DMX input breakout | MAX485-based RS-485-to-TTL module, opto-isolated | 1 | ~$3–5. Feeds a spare UART on the control board. |
+| DMX input jack | XLR 5-pin panel-mount jack + short DMX jumper cable to the TimoLink RX, feeding a MAX485-based RS-485-to-TTL breakout | 1 | ~$8–12 total. Feeds a spare UART on the control board; keeps the TimoLink RX un-modified and reusable standalone. |
 | Pan motor | NEMA 11 or NEMA 14 stepper | 1 | ~$10–15. Sized for the light LiteFlow payload (§4.2 of the plan) — don't over-spec to NEMA 17. |
 | Tilt motor | NEMA 11 or NEMA 14 stepper | 1 | ~$10–15. |
 | Position feedback | AS5600 magnetic encoder breakout | 2 | ~$5 each. One per axis, for homing/closed-loop accuracy. |
@@ -39,11 +39,16 @@ the form factor or finish demands it.
 | Power supply | 12V or 24V DC (matched to the control board/driver choice), locking barrel or similar | 1 | Check current draw once motors are selected; light-duty motors should keep this modest. |
 | Misc hardware | Bearings, fasteners, wiring, connectors | — | |
 
-## CRMX Slim RX RDM pricing
+## CRMX receiver: how the pick changed
 
-LumenRadio doesn't publish retail pricing, and no US dealer (Full Compass,
-B&H) lists a price on-page — those show "Call for price." Real retail
-listings found elsewhere give a working range:
+Companies like Godox and Aputure don't buy a boxed receiver at all — they
+license LumenRadio's board-level CRMX module ("CRMXchip"/OE-GRX1) and solder
+it onto their own fixture PCB. That requires a design-in relationship with
+LumenRadio (dev kit, NDA, volume commitment) — the right call at
+manufacturing scale, the wrong one for 5 hand-built units.
+
+The LumenRadio **CRMX Slim RX RDM** (the original pick) is a standalone box
+around that same chip, but priced for the lighting-rental industry:
 
 | Source | Price |
 |---|---|
@@ -51,13 +56,15 @@ listings found elsewhere give a working range:
 | eBay UK listing | $400 USD (likely discounted/used stock) |
 | KEL-PLS (New Zealand) | NZD $1,400 ex. GST (~$825 USD, import pricing) |
 
-**Working estimate: ~$400–600/unit**, with the German listing as the most
-credible new-stock data point. At 5 units that's roughly **$2,000–3,000**
-for the RX side alone — the single most expensive line item in this BOM,
-well above the motors/drivers/encoders combined. Get an actual quote from a
-US dealer (Full Compass or B&H, referencing "LumenRadio CRMX Slim RX RDM"
-by name) before finalizing budget, since none of the above are quotes for
-your specific order.
+The **Godox TimoLink RX** is the same idea — a standalone box around a
+genuine LumenRadio CRMX receiver — but priced for the consumer/prosumer
+photo-video market instead: **$189 at B&H**, a real listed price, no dealer
+quote needed. That's the pick now used in the BOM above, saving roughly
+$1,000–2,000 across 5 units with no loss of certification or
+interoperability (it's the same underlying CRMX technology).
+
+Keep the Slim RX RDM in mind only if a future revision needs its IP65
+rating or terminal-block wiring — not relevant for this indoor-only build.
 
 ## Cost caveat
 
@@ -68,8 +75,8 @@ per-unit cost.
 
 ## Next steps
 
-1. Get an actual CRMX Slim RX RDM quote from a US dealer (this is the
-   long-lead, most expensive item).
+1. Order one Godox TimoLink RX and confirm it pairs cleanly with your
+   existing CRMX transmitter and Blackout setup before buying 4 more.
 2. Confirm the control-board choice by checking its GPIO/UART count against
    the DMX input + 2 stepper drivers + 2 encoders (I2C, so they can share a
    bus) requirement.
