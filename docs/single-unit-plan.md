@@ -46,3 +46,17 @@ socket on each end — one to the stand, one receiving the LiteFlow panel's
 own Godox WMS rail stud directly. It's a concept sketch, not dimensioned
 for fabrication — see `pan-tilt-module-plan.md` for the mechanical
 rationale behind the layout.
+
+## 3D model
+
+Interactive 3D version, built at true relative scale (1 unit = 1 inch):
+https://claude.ai/code/artifact/e48f5b2e-a5e3-4563-9f12-0844e0b88291
+
+Drag to orbit, scroll to zoom. Pan and tilt sliders drive the same
+geometry through the actual proposed ranges (~180–270° pan, ~90–120°
+tilt), a size selector swaps between the 3", 10", and 20" LiteFlow panels
+on the same fixed yoke, and an internals toggle reveals the motor and
+controller stack inside the housing. Same simplifications as the 2D
+sketch — the mirror-side pivot is a single bearing point rather than a
+modeled clevis, and the housing is a plain box rather than a vented
+enclosure.
