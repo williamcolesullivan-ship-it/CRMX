@@ -81,8 +81,8 @@ e.g. LumenRadio Stardust/Aurora, Exalux Connect One/Connect+, Ratpac AKS+
 FTSLED Cerise/Cinelex Skycast if you'd rather run a cable to the iPad. That
 TX node is **not part of this module** — it's simply the CRMX transmitter
 our modules pair with, exactly as they would with any other CRMX fixture.
-If you don't already own one, it's a prerequisite purchase for this whole
-system to function, independent of anything built here.
+You've confirmed you already have a CRMX transmitter, so this is resolved —
+nothing further to build or buy on the TX side.
 
 **RX side, sized for <5 units:** don't go through LumenRadio's OEM/CRMXchip
 channel — that's built for manufacturers embedding the chip at volume and
@@ -181,10 +181,6 @@ only RF component in the design.
 
 ## 6. Key risks
 
-- **You need a CRMX TX node before any of this works.** Blackout only
-  outputs WiFi Art-Net/sACN — confirm you have (or budget for) a CRMX
-  transmitter/gateway (Stardust, Aurora, Exalux Connect, etc.) before
-  building the RX side. See §4.1.
 - CRMX licensing/certification — see §4.1; don't attempt to reverse-engineer
   the RF protocol; use certified standalone RX units instead of the OEM
   chip channel given the small quantity.
