@@ -26,7 +26,7 @@ the form factor or finish demands it.
 
 | Item | Example part | Qty/unit | Notes |
 |---|---|---|---|
-| CRMX receiver | LumenRadio CRMX Slim RX RDM | 1 | IP65, terminal-block DMX/RDM out — wire straight to the control board's DMX input. Certified, no OEM relationship needed. Get a quote from a dealer (Full Compass, Highlite, LCA) — not listed publicly. |
+| CRMX receiver | LumenRadio CRMX Slim RX RDM | 1 | IP65, terminal-block DMX/RDM out — wire straight to the control board's DMX input. Certified, no OEM relationship needed. **~$400–600/unit** — see pricing note below. |
 | Control board | BTT SKR Mini E3 V3 (or similar STM32-based 3D-printer board) | 1 | ~$25–30. Integrates MCU + 2 TMC2209 driver sockets. |
 | DMX input breakout | MAX485-based RS-485-to-TTL module, opto-isolated | 1 | ~$3–5. Feeds a spare UART on the control board. |
 | Pan motor | NEMA 11 or NEMA 14 stepper | 1 | ~$10–15. Sized for the light LiteFlow payload (§4.2 of the plan) — don't over-spec to NEMA 17. |
@@ -39,18 +39,37 @@ the form factor or finish demands it.
 | Power supply | 12V or 24V DC (matched to the control board/driver choice), locking barrel or similar | 1 | Check current draw once motors are selected; light-duty motors should keep this modest. |
 | Misc hardware | Bearings, fasteners, wiring, connectors | — | |
 
+## CRMX Slim RX RDM pricing
+
+LumenRadio doesn't publish retail pricing, and no US dealer (Full Compass,
+B&H) lists a price on-page — those show "Call for price." Real retail
+listings found elsewhere give a working range:
+
+| Source | Price |
+|---|---|
+| Deejay-House (Germany) | €535.77 (~$580 USD) |
+| eBay UK listing | $400 USD (likely discounted/used stock) |
+| KEL-PLS (New Zealand) | NZD $1,400 ex. GST (~$825 USD, import pricing) |
+
+**Working estimate: ~$400–600/unit**, with the German listing as the most
+credible new-stock data point. At 5 units that's roughly **$2,000–3,000**
+for the RX side alone — the single most expensive line item in this BOM,
+well above the motors/drivers/encoders combined. Get an actual quote from a
+US dealer (Full Compass or B&H, referencing "LumenRadio CRMX Slim RX RDM"
+by name) before finalizing budget, since none of the above are quotes for
+your specific order.
+
 ## Cost caveat
 
-Prices above are rough market ranges from general knowledge of these parts,
-not live quotes — the one line item that actually needs a real quote before
-budgeting is the CRMX Slim RX RDM (LumenRadio doesn't publish retail
-pricing; contact a dealer). Everything else is common maker-community
-hardware with well-known street pricing, but confirm current prices before
-finalizing a per-unit cost.
+Other prices above are rough market ranges from general knowledge of these
+parts, not live quotes. They're common maker-community hardware with
+well-known street pricing, but confirm current prices before finalizing a
+per-unit cost.
 
 ## Next steps
 
-1. Get a CRMX Slim RX RDM quote (this is the long-lead, non-obvious item).
+1. Get an actual CRMX Slim RX RDM quote from a US dealer (this is the
+   long-lead, most expensive item).
 2. Confirm the control-board choice by checking its GPIO/UART count against
    the DMX input + 2 stepper drivers + 2 encoders (I2C, so they can share a
    bus) requirement.
